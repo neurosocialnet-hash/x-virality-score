@@ -1,0 +1,93 @@
+{
+  "title": "Daily X narrative digest — YYYY-MM-DD",
+  "date": "2026-09-15",
+  "timezone": "Europe/Moscow",
+  "updated": "2026-09-16T12:05:31+03:00",
+  "brand_title": "Your X Virality Score",
+  "brand_handle": "@your_handle",
+  "hits": [],
+  "virals": [],
+  "outsiders": [],
+  "patterns": [
+    "example-pattern"
+  ],
+  "no_hits": [
+    {
+      "handle": "@example_quiet",
+      "reason": "No unpinned day original reached 5,000 views; highest observed was 1,200 views.",
+      "max_views": 1200
+    }
+  ],
+  "virals_narrative": "Short outsider synthesis goes here.",
+  "narrative_synthesis": "Short outsider synthesis goes here.",
+  "virals_window": "last ~48h",
+  "virals_target": 20,
+  "hits_count": 0,
+  "outsiders_count": 0,
+  "previous_day": {
+    "date": "2026-09-14",
+    "hits_count": 0,
+    "total_views": 0,
+    "x_score": 0
+  },
+  "leaderboards": {
+    "as_of": "2026-09-15",
+    "tracking_start": "2026-09-13",
+    "days_included": [
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-12",
+      "2026-09-13",
+      "2026-09-14",
+      "2026-09-15"
+    ],
+    "month_days_included": [
+      "2026-09-13",
+      "2026-09-14",
+      "2026-09-15"
+    ],
+    "week": {
+      "label": "Rolling week · Sep 9–Sep 15",
+      "range": [
+        "2026-09-09",
+        "2026-09-15"
+      ],
+      "entries": []
+    },
+    "month": {
+      "label": "September 2026 · from Sep 13",
+      "range": [
+        "2026-09-13",
+        "2026-09-15"
+      ],
+      "entries": []
+    }
+  },
+  "board_features": {
+    "count_up": true,
+    "live_pulse": true,
+    "theme_toggle": true,
+    "themes": [
+      "night",
+      "day"
+    ],
+    "grok_ambient": true,
+    "week_month_boards": true,
+    "day_roster_best_total": true,
+    "day_compare_chart": true,
+    "week_strip": true,
+    "no_hits_reasons": true,
+    "marker_class": "xvs-dash-2026"
+  },
+  "operator": {
+    "handle": "@your_handle",
+    "name": "Your Name",
+    "profile_url": "https://x.com/your_handle"
+  },
+  "ui": {
+    "default_theme": "night"
+  },
+  "day_roster": [],
+  "you_rank": null
+}
