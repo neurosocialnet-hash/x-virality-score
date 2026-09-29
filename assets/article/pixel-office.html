@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Grok Bot · Pixel Office</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1100px; height: 620px; overflow: hidden;
+    background: #1a1410;
+    image-rendering: pixelated;
+    font-family: ui-monospace, monospace;
+  }
+  canvas { display: block; width: 1100px; height: 620px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1100" height="620"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+function px(x,y,w,h,color){ ctx.fillStyle=color; ctx.fillRect(x|0,y|0,w|0,h|0); }
+function rect(x,y,w,h,fill,stroke){
+  if(fill){ ctx.fillStyle=fill; ctx.fillRect(x,y,w,h); }
+  if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.strokeRect(x+1,y+1,w-2,h-2); }
+}
+
+// --- background wall ---
+const wallTop = 0, wallH = 280;
+px(0,0,1100,wallH,'#2a3340');
+// subtle wall stripes
+for(let x=0;x<1100;x+=48) px(x,0,2,wallH,'#24303c');
+
+// ceiling beam
+px(0,0,1100,18,'#1b222b');
+px(0,18,1100,4,'#3a4654');
+
+// windows (3 big)
+function windowPane(x,y,w,h){
+  px(x,y,w,h,'#7ec8ff');
+  // sky gradient bands
+  px(x,y,w,Math.floor(h*0.35),'#9ad6ff');
+  px(x,y+Math.floor(h*0.35),w,Math.floor(h*0.25),'#6bb8f0');
+  // distant buildings silhouettes
+  for(let i=0;i<5;i++){
+    const bx = x+10+i*22;
+    const bh = 28 + (i%3)*14;
+    px(bx, y+h-bh-8, 16, bh, '#3d5a78');
+    px(bx+4, y+h-bh+6, 3, 3, '#ffd27a');
+    px(bx+10, y+h-bh+12, 3, 3, '#ffd27a');
+  }
+  // frame
+  px(x,y,w,6,'#1a222c');
+  px(x,y+h-6,w,6,'#1a222c');
+  px(x,y,6,h,'#1a222c');
+  px(x+w-6,y,6,h,'#1a222c');
+  px(x+w/2-3,y,6,h,'#1a222c');
+  px(x,y+h/2-3,w,6,'#1a222c');
+  // sill
+  px(x-4,y+h,w+8,8,'#4a5563');
+  px(x-4,y+h+8,w+8,3,'#2c343e');
+}
+windowPane(70,42,210,150);
+windowPane(445,42,210,150);
+windowPane(820,42,210,150);
+
+// warm evening light wash from windows
+ctx.fillStyle = 'rgba(255, 200, 120, 0.08)';
+ctx.fillRect(0,0,1100,wallH);
+
+// floor
+const floorY = 280;
+px(0,floorY,1100,340,'#3b2a1c');
+// wood plank bands
+for(let y=floorY;y<620;y+=18){
+  px(0,y,1100,2,'#2e2116');
+}
+// perspective-ish tile grid
+ctx.strokeStyle = 'rgba(90,70,45,0.55)';
+ctx.lineWidth = 1;
+for(let x=0;x<=1100;x+=40){
+  ctx.beginPath();
+  ctx.moveTo(x, floorY);
+  ctx.lineTo(x + (x-550)*0.08, 620);
+  ctx.stroke();
+}
+for(let i=0;i<12;i++){
+  const y = floorY + 20 + i*i*2.2;
+  if(y>620) break;
+  ctx.beginPath();
+  ctx.moveTo(0,y); ctx.lineTo(1100,y); ctx.stroke();
+}
+// darker rug under desks
+px(80,420,940,150,'#2a1d14');
+px(90,430,920,130,'#352418');
+for(let x=100;x<1000;x+=28) px(x,440,2,110,'#2a1d14');
+for(let y=450;y<550;y+=22) px(100,y,900,2,'#2a1d14');
+
+// back wall baseboard
+px(0,floorY-10,1100,10,'#1e262f');
+
+// plants in corners
+function plant(x,y){
+  px(x,y,28,18,'#5a3a22');
+  px(x+4,y-8,20,8,'#4a301c');
+  px(x+10,y-38,8,30,'#2f6b35');
+  px(x+2,y-34,12,10,'#3d8a42');
+  px(x+14,y-40,14,12,'#48a04e');
+  px(x+6,y-48,10,10,'#56b85c');
+}
+plant(30,268); plant(1040,268);
+
+// wall posters / screens
+function wallScreen(x,y,label,color){
+  px(x,y,70,48,'#0b1016');
+  px(x+4,y+4,62,40,color);
+  px(x+8,y+10,20,4,'#fff');
+  px(x+8,y+18,40,3,'rgba(255,255,255,0.5)');
+  px(x+8,y+26,30,3,'rgba(255,255,255,0.35)');
+  ctx.fillStyle='#9aa7b2';
+  ctx.font='10px monospace';
+  ctx.fillText(label, x, y+62);
+}
+wallScreen(300,90,'SCOUT','#124a3a');
+wallScreen(320,160,'DRAFT','#3a2a12');
+wallScreen(700,90,'BOARD','#123a4a');
+wallScreen(720,160,'META','#3a1230');
+
+// desks row
+function desk(x,y,lampOn){
+  // legs
+  px(x+8,y+38,8,34,'#4a3424');
+  px(x+118,y+38,8,34,'#4a3424');
+  // top
+  px(x,y+28,134,14,'#6b4a30');
+  px(x,y+26,134,4,'#8a6342');
+  // monitor
+  px(x+42,y-18,50,42,'#1a1f28');
+  px(x+46,y-14,42,32,'#20d9ff');
+  px(x+50,y-8,16,3,'#0b2a33');
+  px(x+50,y-2,28,3,'#0b2a33');
+  px(x+50,y+4,22,3,'#0b2a33');
+  px(x+62,y+24,10,8,'#2a323c'); // stand
+  // keyboard
+  px(x+38,y+36,58,8,'#2b3138');
+  for(let i=0;i<6;i++) px(x+42+i*8,y+38,5,3,'#4a5560');
+  // lamp
+  const lx=x+112, ly=y+8;
+  px(lx,ly+18,6,18,'#5a4634');
+  px(lx-8,ly,22,12,'#c9a06a');
+  if(lampOn){
+    ctx.fillStyle='rgba(255,190,90,0.22)';
+    ctx.beginPath();
+    ctx.moveTo(lx+3,ly+12);
+    ctx.lineTo(lx-30,y+70);
+    ctx.lineTo(lx+36,y+70);
+    ctx.closePath();
+    ctx.fill();
+    px(lx-2,ly+2,10,6,'#ffe7a8');
+  }
+  // mug
+  px(x+18,y+32,10,12,'#d4574a');
+  px(x+20,y+34,6,6,'#8a2f28');
+}
+
+function agent(x,y,shirt,hair,working){
+  // shadow
+  px(x-2,y+46,28,6,'rgba(0,0,0,0.25)');
+  // legs
+  px(x+4,y+34,8,16,'#2a3340');
+  px(x+14,y+34,8,16,'#2a3340');
+  // shoes
+  px(x+2,y+48,10,4,'#1a1410');
+  px(x+14,y+48,10,4,'#1a1410');
+  // body / chair back peek
+  px(x-4,y+18,8,28,'#3a2f28');
+  px(x+20,y+18,8,28,'#3a2f28');
+  px(x+2,y+16,20,22,shirt);
+  // arms
+  if(working){
+    px(x-2,y+20,8,6,shirt);
+    px(x+18,y+20,8,6,shirt);
+    px(x-4,y+24,10,4,'#e8c4a0');
+    px(x+18,y+24,10,4,'#e8c4a0');
+  } else {
+    px(x-2,y+22,6,14,shirt);
+    px(x+20,y+22,6,14,shirt);
+  }
+  // head
+  px(x+4,y+2,16,16,'#e8c4a0');
+  px(x+4,y,16,6,hair);
+  px(x+2,y+4,4,10,hair);
+  px(x+18,y+4,4,10,hair);
+  // eyes
+  px(x+7,y+8,3,3,'#1a1410');
+  px(x+14,y+8,3,3,'#1a1410');
+  // smile
+  px(x+9,y+13,6,2,'#c48a6a');
+}
+
+const desks = [
+  {x:100,y:360,shirt:'#3dff9b',hair:'#2a1a10',label:'SCOUT'},
+  {x:280,y:360,shirt:'#20d9ff',hair:'#4a3020',label:'DRAFT'},
+  {x:460,y:360,shirt:'#ffc94a',hair:'#1a1410',label:'BOARD'},
+  {x:640,y:360,shirt:'#ff5570',hair:'#6a3a20',label:'META'},
+  {x:820,y:360,shirt:'#b8ff3d',hair:'#3a2818',label:'YOU'},
+];
+
+desks.forEach((d,i)=>{
+  desk(d.x, d.y, true);
+  agent(d.x+48, d.y+8, d.shirt, d.hair, true);
+  // nameplate
+  px(d.x+20, d.y+72, 70, 16, '#1a1410');
+  ctx.fillStyle = '#e8efe8';
+  ctx.font = 'bold 11px monospace';
+  ctx.fillText(d.label, d.x+28, d.y+84);
+});
+
+// floating speech / status chips
+function chip(x,y,text,color){
+  const w = text.length*7+16;
+  px(x,y,w,18,color);
+  px(x,y,w,2,'#fff');
+  ctx.fillStyle='#041018';
+  ctx.font='bold 10px monospace';
+  ctx.fillText(text, x+8, y+13);
+}
+chip(120,330,'reading X', '#20d9ff');
+chip(300,318,'drafting', '#ffc94a');
+chip(470,330,'X Score', '#3dff9b');
+chip(655,318,'~20 outs', '#ff5570');
+chip(835,330,'publish', '#b8ff3d');
+
+// title banner
+px(260,560,580,36,'#0b1016');
+px(260,560,580,3,'#20d9ff');
+ctx.fillStyle='#f7f9f9';
+ctx.font='bold 16px monospace';
+ctx.fillText('GROK BOT  ·  X VIRALITY DESK', 310, 583);
+ctx.fillStyle='#899398';
+ctx.font='11px monospace';
+ctx.fillText('scout · draft · board · you publish', 360, 545);
+
+// warm vignette
+const g = ctx.createRadialGradient(550,380,120,550,320,700);
+g.addColorStop(0,'rgba(0,0,0,0)');
+g.addColorStop(1,'rgba(10,6,4,0.45)');
+ctx.fillStyle=g;
+ctx.fillRect(0,0,1100,620);
+</script>
+</body>
+</html>
