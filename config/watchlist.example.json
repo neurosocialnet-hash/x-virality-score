@@ -1,0 +1,10 @@
+{
+  "timezone": "Europe/Moscow",
+  "min_views": 5000,
+  "star_views": 10000,
+  "accounts": [
+    "example_account",
+    "another_handle"
+  ],
+  "_comment": "Copy this file to config/watchlist.json (gitignored). Replace the placeholders with handles you track, without @. Optional object form also works: {\"handle\": \"example_account\", \"notes\": \"why you watch them\"}."
+}
