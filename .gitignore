@@ -1,0 +1,15 @@
+# Personal desk files. Copy the committed examples, then keep yours local
+# so a later pull does not overwrite them.
+config/watchlist.json
+board/data.json
+board/leaderboard_ledger.json
+
+__pycache__/
+*.pyc
+
+# Secrets and sessions. Never commit these.
+.env
+.env.*
+*.cookies
+cookies.txt
+*session*.json
