@@ -3,7 +3,8 @@
 
 Clean-epoch mode for @connectrom. No X login, cookies, tokens or API keys.
 Search-index results are discovery candidates only. Old/deleted indexed posts
-are excluded from scoring. View counts are never invented.
+are excluded from scoring. Search snippets are not authoritative metrics, so
+view counts found there remain unverified hints and never enter scoring.
 """
 from __future__ import annotations
 import argparse, html as htmllib, json, re, urllib.parse, urllib.request
@@ -45,10 +46,15 @@ def extract(source,raw,handle,found):
         author,pid=m.groups()
         if author.lower()!=handle.lower():continue
         context=clean(raw[max(0,m.start()-700):min(len(raw),m.end()+700)])
-        vm=VIEW_RE.search(context); views=parse_number(vm.group(1)) if vm else None
+        vm=VIEW_RE.search(context); hint=parse_number(vm.group(1)) if vm else None
         item=found.setdefault(pid,{"id":pid,"handle":"@"+author,"url":f"https://x.com/{author}/status/{pid}","views":None,"views_verified":False,"sources":[]})
         if source not in item["sources"]:item["sources"].append(source)
-        if views is not None:item["views"],item["views_verified"]=views,True
+        # Search-engine snippets can be stale or associate nearby text with the
+        # wrong status. Keep any parsed count only as an explicitly untrusted
+        # diagnostic hint; it must never satisfy a scoring threshold.
+        if hint is not None:
+            item["search_view_hint"] = max(hint, item.get("search_view_hint") or 0)
+            item["search_view_hint_verified"] = False
 
 def discover(handle):
     found,status={},{}
@@ -74,7 +80,7 @@ def build(handle,tz,min_views,star_views,tracking_start):
     hits=[p for p in verified if p["views"]>=min_views]
     for p in hits:p["star"]=p["views"]>=star_views
     unknown=[p for p in current if not p["views_verified"]]
-    return {"title":f"Daily X narrative digest — {now.date().isoformat()}","date":now.date().isoformat(),"timezone":tz,"updated":now.isoformat(timespec="seconds"),"brand_title":"Connectrom X Virality Score","brand_handle":"@"+handle,"collector_mode":"public_fallback_clean_epoch","tracking_start":tracking_start,"tracking_policy":"Only posts created on/after tracking_start can score. Older search-index remnants are excluded.","metric_policy":"No inferred or invented view counts; unknown remains unknown.","thresholds":{"min_views":min_views,"star_views":star_views},"source_status":source_status,"discovered_candidates":len(candidates),"excluded_pre_epoch":len(old),"excluded_candidates":old,"public_posts_found":len(current),"verified_view_metrics":len(verified),"unknown_metrics":unknown,"hits":hits,"hits_count":len(hits),"virals":[],"outsiders":[],"patterns":[],"no_hits":[],"operator":{"handle":"@"+handle,"name":handle,"profile_url":f"https://x.com/{handle}"},"ui":{"default_theme":"night"}}
+    return {"title":f"Daily X narrative digest — {now.date().isoformat()}","date":now.date().isoformat(),"timezone":tz,"updated":now.isoformat(timespec="seconds"),"brand_title":"Connectrom X Virality Score","brand_handle":"@"+handle,"collector_mode":"public_fallback_clean_epoch","tracking_start":tracking_start,"tracking_policy":"Only posts created on/after tracking_start can score. Older search-index remnants are excluded.","metric_policy":"Search snippets are discovery evidence only. No inferred or invented view counts; unverified counts remain hints and unknown for scoring.","thresholds":{"min_views":min_views,"star_views":star_views},"source_status":source_status,"discovered_candidates":len(candidates),"excluded_pre_epoch":len(old),"excluded_candidates":old,"public_posts_found":len(current),"verified_view_metrics":len(verified),"unknown_metrics":unknown,"hits":hits,"hits_count":len(hits),"virals":[],"outsiders":[],"patterns":[],"no_hits":[],"operator":{"handle":"@"+handle,"name":handle,"profile_url":f"https://x.com/{handle}"},"ui":{"default_theme":"night"}}
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument("--handle",default="connectrom");ap.add_argument("--timezone",default="Europe/London");ap.add_argument("--min-views",type=int,default=5000);ap.add_argument("--star-views",type=int,default=10000);ap.add_argument("--tracking-start",default="2026-10-03T00:00:00");ap.add_argument("--output",default="board/data.public.json");a=ap.parse_args()
